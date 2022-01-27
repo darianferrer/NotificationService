@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  integration-tests-notificationservice:
+    container_name: NotificationService
+    build:
+      context: .
+      dockerfile: Database/Dockerfile
+    ports:
+      - "1500:1433"
+    environment:
+      - "MSSQL_PID=Express"
+      - "ACCEPT_EULA=Y"
+      - "SA_PASSWORD=8C95236e5c184427be90e9a648c5a4c2"
