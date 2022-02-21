@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Ductus.FluentDocker.Builders;
+using Ductus.FluentDocker.Common;
 using Ductus.FluentDocker.Services;
 using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Hosting;
@@ -62,6 +63,7 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
     private void SetupDatabaseContainer()
     {
         var dockerFile = _configuration["DockerComposeFile"];
+        var connectionString = _configuration["AppSettings:ConnectionString"];
 
         Console.WriteLine("Starting Docker container with SQL database");
         _compositeService = new Builder()
@@ -69,18 +71,37 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
             .WaitForPort("1500/tcp", 5000)
             .UseCompose()
             .FromFile(dockerFile)
+#if !DEBUG
             .RemoveOrphans()
             .RemoveAllImages()
+#endif
+            .Wait("NotificationService", (service, count) =>
+            {
+                if (count > 60)
+                {
+                    throw new FluentDockerException("Failed to wait for sql server");
+                }
+
+                using var connection = new SqlConnection(connectionString);
+                try
+                {
+                    connection.Open();
+                    return 0; //Zero and below means success
+                }
+                catch (Exception)
+                {
+                    return 1000; //The time to wait until next execution
+                }
+            })
             .Build()
             .Start();
 
-        using var serviceProvider = GetServiceProvider();
+        using var serviceProvider = GetServiceProvider(connectionString);
         MigrateDatabase(serviceProvider);
     }
 
-    private ServiceProvider GetServiceProvider()
+    private static ServiceProvider GetServiceProvider(string connectionString)
     {
-        var connectionString = _configuration["AppSettings:ConnectionString"];
         var serviceProvider = new ServiceCollection()
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
