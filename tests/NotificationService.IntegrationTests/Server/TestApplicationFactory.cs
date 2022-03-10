@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 using Ductus.FluentDocker.Builders;
 using Ductus.FluentDocker.Common;
 using Ductus.FluentDocker.Services;
@@ -117,23 +116,9 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
     private static void MigrateDatabase(ServiceProvider serviceProvider)
     {
         Console.WriteLine("Starting migrating SQL database to latest version");
-        var retries = 20;
-        while (retries > 0)
-        {
-            using var scope = serviceProvider.CreateScope();
-            var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
-            try
-            {
-                runner.MigrateUp();
-                Console.WriteLine("Migration command succeed!");
-                break;
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine($"Migration command failed, trying again in 1s. Error: {ex.Message}");
-                Thread.Sleep(1000);
-                retries--;
-            }
-        }
+        using var scope = serviceProvider.CreateScope();
+        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+        runner.MigrateUp();
+        Console.WriteLine("Migration command succeed!");
     }
 }
