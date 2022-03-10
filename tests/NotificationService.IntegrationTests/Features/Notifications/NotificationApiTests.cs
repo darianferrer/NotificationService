@@ -57,7 +57,7 @@ public class NotificationApiTests : IAsyncLifetime
 
         // Assert  
         result.StatusCode.Should().Be(HttpStatusCode.Created);
-        var responseStream = await result.Content.ReadAsStreamAsync();
+        using var responseStream = await result.Content.ReadAsStreamAsync();
         var response = await JsonSerializer.DeserializeAsync<Notification>(
             responseStream,
             _options);
@@ -102,7 +102,7 @@ public class NotificationApiTests : IAsyncLifetime
 
         // Assert  
         result.StatusCode.Should().Be(HttpStatusCode.Created);
-        var responseStream = await result.Content.ReadAsStreamAsync();
+        using var responseStream = await result.Content.ReadAsStreamAsync();
         var response = await JsonSerializer.DeserializeAsync<Notification>(
             responseStream,
             _options);
@@ -146,7 +146,7 @@ public class NotificationApiTests : IAsyncLifetime
 
         // Assert  
         result.StatusCode.Should().Be(HttpStatusCode.Created);
-        var responseStream = await result.Content.ReadAsStreamAsync();
+        using var responseStream = await result.Content.ReadAsStreamAsync();
         var response = await JsonSerializer.DeserializeAsync<Notification>(
             responseStream,
             _options);
@@ -206,7 +206,7 @@ public class NotificationApiTests : IAsyncLifetime
 
         // Assert 
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var responseStream = await result.Content.ReadAsStreamAsync();
+        using var responseStream = await result.Content.ReadAsStreamAsync();
         var response = await JsonSerializer.DeserializeAsync<IEnumerable<Notification>>(responseStream, _options);
         response.Should().BeEquivalentTo(notifications);
     }
@@ -254,7 +254,7 @@ public class NotificationApiTests : IAsyncLifetime
 
         // Assert  
         result.StatusCode.Should().Be(HttpStatusCode.OK);
-        var responseStream = await result.Content.ReadAsStreamAsync();
+        using var responseStream = await result.Content.ReadAsStreamAsync();
         var response = await JsonSerializer.DeserializeAsync<Notification>(
             responseStream,
             _options);
