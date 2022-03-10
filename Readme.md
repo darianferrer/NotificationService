@@ -1,6 +1,8 @@
 ﻿# Notification service
 Service to manage notifications.
 
+![.NET build and test](https://github.com/darianferrer/NotificationService/actions/workflows/dotnet.yml/badge.svg)
+
 ## How to run
 First thing is to clone the repository. After that's completed, you can use .NET commands to run the service
 
